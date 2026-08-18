@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Pixgo — Admin</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="login-mark">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 2 L21 7 L21 17 L12 22 L3 17 L3 7 Z"/>
+        <path d="M12 2 L12 22 M3 7 L21 17 M21 7 L3 17"/>
+      </svg>
+    </div>
+    <h1>Pixgo Admin</h1>
+    <p class="login-sub">Painel privado. Introduz a admin key para continuar.</p>
+    <form id="login-form">
+      <input type="password" id="login-key" placeholder="Admin key" autocomplete="off" spellcheck="false" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="login-error" class="login-error" hidden></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════ APP ═══════════════════════ -->
+<div id="app" class="app" hidden>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 2 L21 7 L21 17 L12 22 L3 17 L3 7 Z"/>
+        <path d="M12 2 L12 22 M3 7 L21 17 M21 7 L3 17"/>
+      </svg>
+      <span>Pixgo Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-section="overview">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Visão geral
+      </button>
+      <button class="nav-item" data-section="users">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16.5 5.5c1.4.4 2.3 1.7 2.3 3.1s-.9 2.7-2.3 3.1M21 20c0-2.7-1.9-5-4.5-5.7"/></svg>
+        Utilizadores
+      </button>
+      <button class="nav-item" data-section="subscriptions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="1.5"/><path d="M2.5 9.5h19"/><path d="M6 14h4"/></svg>
+        Assinaturas
+      </button>
+      <button class="nav-item" data-section="moderation">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><path d="M12 3l8 4v5c0 4.5-3 8-8 9-5-1-8-4.5-8-9V7l8-4z"/></svg>
+        Moderação
+        <span id="moderation-badge" class="nav-badge" hidden>0</span>
+      </button>
+      <button class="nav-item" data-section="reports">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v10"/><circle cx="12" cy="18" r="0.9" fill="currentColor" stroke="none"/><path d="M4.9 4.9l14.2 14.2"/><path d="M19.1 4.9L4.9 19.1"/></svg>
+        Denúncias
+      </button>
+      <button class="nav-item" data-section="support">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 18h.01"/><path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2 2-2.5 3.2"/><circle cx="12" cy="12" r="9.5"/></svg>
+        Suporte
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="logout-btn" class="logout-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ── OVERVIEW ── -->
+    <section id="section-overview" class="section active">
+      <header class="section-header">
+        <div>
+          <h1>Visão geral</h1>
+          <p class="section-sub">Estado actual da plataforma</p>
+        </div>
+        <button class="btn btn-ghost" id="refresh-overview">Actualizar</button>
+      </header>
+
+      <div class="stat-grid" id="stat-grid"></div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Actividade admin recente</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="activity-table">
+            <thead><tr><th>Acção</th><th>Tipo</th><th>Estado</th><th>Duração</th><th>Quando</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── USERS ── -->
+    <section id="section-users" class="section">
+      <header class="section-header">
+        <div>
+          <h1>Utilizadores</h1>
+          <p class="section-sub">Gestão completa de contas</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="export-users-pdf">Exportar PDF</button>
+          <button class="btn btn-primary" id="new-user-btn">Novo utilizador</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table" id="users-table">
+            <thead><tr><th>Utilizador</th><th>Nome</th><th>Email</th><th>Plano</th><th>Estado</th><th>Criado em</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="users-pagination"></div>
+      </div>
+    </section>
+
+    <!-- ── SUBSCRIPTIONS ── -->
+    <section id="section-subscriptions" class="section">
+      <header class="section-header">
+        <div>
+          <h1>Assinaturas</h1>
+          <p class="section-sub">Quem assinou e quem está no plano gratuito</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="export-subs-pdf">Exportar PDF</button>
+        </div>
+      </header>
+
+      <div class="filter-bar" id="subs-filter">
+        <button class="filter-chip active" data-status="">Todas</button>
+        <button class="filter-chip" data-status="active">Activas</button>
+        <button class="filter-chip" data-status="expired">Expiradas</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table" id="subs-table">
+            <thead><tr><th>Utilizador</th><th>Email</th><th>Plano</th><th>Valor</th><th>Rede</th><th>Estado</th><th>Início</th><th>Expira</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="subs-pagination"></div>
+      </div>
+    </section>
+
+    <!-- ── MODERATION (uploads pendentes) ── -->
+    <section id="section-moderation" class="section">
+      <header class="section-header">
+        <div>
+          <h1>Moderação de uploads</h1>
+          <p class="section-sub">Triagem de copyright (termos + IA) antes de entrar no pipeline</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="export-moderation-pdf">Exportar PDF</button>
+          <button class="btn btn-ghost" id="refresh-moderation">Actualizar</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table" id="moderation-table">
+            <thead><tr><th>Título</th><th>Tipo</th><th>Enviado por</th><th>Estado</th><th>Sinal IA</th><th>Recebido</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REPORTS (denúncias) ── -->
+    <section id="section-reports" class="section">
+      <header class="section-header">
+        <div>
+          <h1>Denúncias</h1>
+          <p class="section-sub">Conteúdo denunciado e quem denunciou</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="export-reports-pdf">Exportar PDF</button>
+          <button class="btn btn-ghost" id="refresh-reports">Actualizar</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table" id="reports-table">
+            <thead><tr><th>Denunciado por</th><th>Conteúdo</th><th>Motivo</th><th>Recebido</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SUPPORT ── -->
+    <section id="section-support" class="section">
+      <header class="section-header">
+        <div>
+          <h1>Suporte</h1>
+          <p class="section-sub">Pedidos de suporte recebidos</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="export-support-pdf">Exportar PDF</button>
+          <button class="btn btn-ghost" id="refresh-support">Actualizar</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table" id="support-table">
+            <thead><tr><th>Email</th><th>Mensagem</th><th>Recebido</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════ MODALS / DRAWER ═══════════════════════ -->
+<div id="overlay" class="overlay" hidden></div>
+
+<div id="user-drawer" class="drawer" hidden>
+  <div class="drawer-header">
+    <h2 id="user-drawer-title">Utilizador</h2>
+    <button class="icon-btn" data-close-drawer>✕</button>
+  </div>
+  <div class="drawer-body" id="user-drawer-body"></div>
+</div>
+
+<div id="new-user-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Novo utilizador</h2>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <form id="new-user-form" class="modal-form">
+      <label>Username<input type="text" name="username" required></label>
+      <label>Password<input type="password" name="password" required minlength="8"></label>
+      <label>Nome<input type="text" name="name" required></label>
+      <label>Email<input type="email" name="email"></label>
+      <label>Role
+        <select name="role">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
+      </label>
+      <label>Plano
+        <select name="plan_id">
+          <option value="free">Free</option>
+          <option value="premium">Mensal Premium</option>
+          <option value="premium_quarterly">Trimestral Premium</option>
+          <option value="premium_annual">Anual Premium</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Criar</button>
+      </div>
+      <p class="form-error" id="new-user-error" hidden></p>
+    </form>
+  </div>
+</div>
+
+<div id="detail-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="detail-modal-title">Detalhe</h2>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <div class="modal-form" id="detail-modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
